@@ -3,8 +3,10 @@ import cv2
 
 def crop_png(file_address):
     img = cv2.imread(file_address + ".png")
+
+    # 1376:1376+3338, 103:103+6338 was manually fitted
     crop_img = img[1376:1376+3338, 103:103+6338]
-    cv2.imwrite("cropped.png", crop_img)
+    cv2.imwrite(file_address + "_cropped.png", crop_img)
 
 
 def main():
