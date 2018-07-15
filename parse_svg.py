@@ -8,11 +8,8 @@ path_strings = [path.getAttribute('d') for path
                 in doc.getElementsByTagName('path')]
 doc.unlink()
 
-count = 0
-
 for path_string in path_strings:
     if path_string[0] == 'm':
-        count += 1
         path_string_split = path_string.split()
         # print(path_string_split)
         cur_x = path_string_split[1].split(',')[0]
@@ -57,5 +54,3 @@ for path_string in path_strings:
         plt.plot(x_values, y_values, '-o', markersize=0.0001)
         # plt.show()
     plt.savefig("../ecg-samples/MUSE_20180323_153150_73000_replot.pdf")
-
-print(count)
