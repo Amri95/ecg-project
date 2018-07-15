@@ -8,52 +8,59 @@ def get_time_series(svg_file_path):
                     in doc.getElementsByTagName('path')]
     doc.unlink()
 
+    count = 0
+    graph_names = ['V1', 'II', 'V5']
+
     for path_string in path_strings:
         if path_string[0] == 'm':
-            path_string_split = path_string.split()
-            # print(path_string_split)
-            cur_x = path_string_split[1].split(',')[0]
-            cur_y = path_string_split[1].split(',')[1]
-            x_values = []
-            y_values = []
-            x_values.append(int(cur_x))
-            y_values.append(int(cur_y))
+            if count > 17:
+                path_string_split = path_string.split()
+                # print(path_string_split)
+                # cur_x = path_string_split[1].split(',')[0]
+                # cur_y = path_string_split[1].split(',')[1]
+                x_values = []
+                y_values = []
+                x_values.append(0)
+                y_values.append(0)
 
-            # print(x_values)
-            # print(y_values)
+                # print(x_values)
+                # print(y_values)
 
-            lineto_horizontal = False
-            # lineto_vertical = False
+                lineto_horizontal = False
+                # lineto_vertical = False
 
-            for i in range(2, len(path_string_split)):
-                if path_string_split[i].isalpha():
-                    if path_string_split[i] == 'h':
-                        lineto_horizontal = True
-                        # lineto_vertical = False
-                    # elif path_string_split[i] == 'v':
-                    #     lineto_vertical = True
-                    #     lineto_horizontal = False
-                elif path_string_split[i].isdigit():
-                    if lineto_horizontal:
-                        # print(i)
-                        # print(x_values[-1])
-                        # print(int(path_string_split[i]))
-                        x_values.append(x_values[-1] + int(path_string_split[i]))
-                        y_values.append(y_values[-1])
-                    # elif lineto_vertical:
-                    #     x_values.append(x_values[i - 1])
-                    #     y_values.append(y_values[i - 1] + int(path_string_split[i]))
-                elif ',' in path_string_split[i]:
-                    delta_x = int(path_string_split[i].split(',')[0])
-                    delta_y = int(path_string_split[i].split(',')[1])
-                    x_values.append(x_values[-1] + delta_x)
-                    y_values.append(y_values[-1] + delta_y)
-            print('x_values:', x_values)
-            print('y_values:', y_values)
+                for i in range(2, len(path_string_split)):
+                    if path_string_split[i].isalpha():
+                        if path_string_split[i] == 'h':
+                            lineto_horizontal = True
+                            # lineto_vertical = False
+                        # elif path_string_split[i] == 'v':
+                        #     lineto_vertical = True
+                        #     lineto_horizontal = False
+                    elif path_string_split[i].isdigit():
+                        if lineto_horizontal:
+                            # print(i)
+                            # print(x_values[-1])
+                            # print(int(path_string_split[i]))
+                            x_values.append(x_values[-1] + int(path_string_split[i]))
+                            y_values.append(y_values[-1])
+                        # elif lineto_vertical:
+                        #     x_values.append(x_values[i - 1])
+                        #     y_values.append(y_values[i - 1] + int(path_string_split[i]))
+                    elif ',' in path_string_split[i]:
+                        delta_x = int(path_string_split[i].split(',')[0])
+                        delta_y = int(path_string_split[i].split(',')[1])
+                        x_values.append(x_values[-1] + delta_x)
+                        y_values.append(y_values[-1] + delta_y)
+                print('x_values:', x_values)
+                print('y_values:', y_values)
 
-            plt.plot(x_values, y_values, '-o', markersize=0.0001)
-            # plt.show()
-        plt.savefig("../ecg-samples/MUSE_20180323_153150_73000_replot.pdf")
+                plt.figure(figsize=(20, 5))
+                plt.title(graph_names[count - 18])
+                plt.plot(x_values, y_values, '-o', markersize=0.01)
+                plt.savefig("../ecg-samples/MUSE_20180323_153150_73000_replot_" + graph_names[count - 18] + ".pdf")
+                # plt.show()
+            count += 1
 
 
 def main():
