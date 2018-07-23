@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from xml.dom import minidom
+import pickle
 
 
 def get_time_series(svg_file_path):
@@ -55,17 +56,45 @@ def get_time_series(svg_file_path):
                 print('x_values:', x_values)
                 print('y_values:', y_values)
 
+                pickle_values(svg_file_path[: -4] + "_" + graph_names[count - 18], x_values, y_values)
+
                 plt.figure(figsize=(20, 5))
                 plt.title(graph_names[count - 18])
                 plt.plot(x_values, y_values, '-o', markersize=0.01)
-                plt.savefig("../ecg-samples/MUSE_20180323_153150_73000_replot_" + graph_names[count - 18] + ".pdf")
+                # plt.savefig("../ecg-samples/MUSE_20180323_153150_73000_replot_" + graph_names[count - 18] + ".pdf")
                 # plt.show()
             count += 1
+
+
+def pickle_values(file_name, x_values, y_values):
+    print(file_name)
+    with open(file_name + "_x_values.txt", "wb") as fp:
+        pickle.dump(x_values, fp)
+    with open(file_name + "_y_values.txt", "wb") as fp:
+        pickle.dump(y_values, fp)
+
+
+def unpickle_values(file_path):
+    with open(file_path + "_x_values.txt", "rb") as fp:
+        x_values = pickle.load(fp)
+    with open(file_path + "_y_values.txt", "rb") as fp:
+        y_values = pickle.load(fp)
+
+    return x_values, y_values
+
 
 
 def main():
     svg_file_path = '../ecg-samples/MUSE_20180323_153150_73000.svg'
     get_time_series(svg_file_path)
+
+    graph_names = ['V1', 'II', 'V5']
+    for graph_name in graph_names:
+        x_values, y_values = unpickle_values(svg_file_path[: -4] + "_" + graph_name)
+        # print(x_values)
+        # print(y_values)
+
+
 
 
 if __name__ == "__main__":
