@@ -1,4 +1,7 @@
 import pickle
+from scipy import signal
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def unpickle_values(file_path):
@@ -11,7 +14,19 @@ def unpickle_values(file_path):
 
 
 def short_term_fourier_transform(x_values, y_values):
-    return True
+    fs = 500
+    amp = 2 * np.sqrt(2)
+    window = signal.hamming(256)
+
+    f, t, Zxx = signal.spectrogram(np.array(y_values), fs, nperseg=256, window=window, noverlap=255, mode='magnitude')
+    print(t)
+    plt.pcolormesh(t, f, np.abs(Zxx), vmin=0, vmax=amp)
+    plt.title('STFT Magnitude')
+    plt.ylabel('Frequency (Hz)')
+    plt.xlabel('Time (seconds)')
+    plt.colorbar()
+
+    plt.show()
 
 
 def main():
