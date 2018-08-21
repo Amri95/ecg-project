@@ -40,7 +40,8 @@ def short_term_fourier_transform(time_series, graph_name):
     f, t, Zxx = signal.stft(np.array(time_series), fs, nperseg=512, window=window, noverlap=511)
 
     plt.pcolormesh(t, f, np.absolute(Zxx)*np.absolute(Zxx), vmin=0, vmax=amp)
-    plt.title('Filtered STFT Spectrogram: ' + graph_name)
+    # plt.title('Filtered STFT Spectrogram: ' + graph_name)
+    plt.title(graph_name + ' (filtered) Spectrogram')
     plt.ylabel('Frequency (Hz)')
     plt.xlabel('Time (seconds)')
     plt.colorbar()
@@ -64,7 +65,9 @@ def main():
         new_time_series = butter_bandpass_filter(time_series, lowcut, highcut, fs, order=5)
 
         plt.plot(x_values, time_series, '-o', markersize=0.01)
+        plt.title(graph_name)
         plt.show()
+        plt.title(graph_name + ' (filtered)')
         plt.plot(x_values, new_time_series, '-o', markersize=0.01)
         plt.show()
         short_term_fourier_transform(new_time_series, graph_name)

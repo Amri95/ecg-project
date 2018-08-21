@@ -54,9 +54,9 @@ def get_time_series(svg_file_path):
                         x_values.append(x_values[-1] + delta_x)
                         y_values.append(y_values[-1] + delta_y)
                 print('x_values:', x_values)
-                print(len(x_values))
+                # print(len(x_values))
                 print('y_values:', y_values)
-                print(len(y_values))
+                # print(len(y_values))
                 print(abs(max(y_values, key=abs)))
                 for i in range(len(x_values)):
                     if type(x_values[i]) != float or type(y_values[i]) != float:
