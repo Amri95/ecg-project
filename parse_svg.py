@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from xml.dom import minidom
 import pickle
+import os
 
 
 def get_time_series(svg_file_path):
@@ -91,10 +92,17 @@ def unpickle_values(file_path):
 
 
 def main():
-    svg_file_path = '../ecg-samples/MUSE_20180323_153150_73000.svg'
-    # svg_file_path = '../ecg-samples/ecg_1.svg'
+    path = "..\ecg-samples\\"
+    for file_name in os.listdir(path):
+        # print(file_name)
+        if file_name[-4:] == ".svg":
+            print(file_name)
+            get_time_series(path + file_name)
 
-    get_time_series(svg_file_path)
+    # svg_file_path = '../ecg-samples/MUSE_20180323_153150_73000.svg'
+    # svg_file_path = '../ecg-samples/ecg_1.svg'
+    #
+    # get_time_series(svg_file_path)
 
     # graph_names = ['V1', 'II', 'V5']
     # for graph_name in graph_names:
