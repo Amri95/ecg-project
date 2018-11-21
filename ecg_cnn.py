@@ -4,6 +4,8 @@ from __future__ import print_function
 
 import numpy as np
 import tensorflow as tf
+import cv2 as cv
+
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -87,9 +89,23 @@ def cnn_model_fn(features, labels, mode):
         mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 
 
+def load_image(addr):
+    # read an image and resize to (224, 224)
+    # cv2 load images as BGR, convert it to RGB
+    img = cv.imread(addr)
+    if img is None:
+        return None
+    img = cv.resize(img, (224, 224), interpolation=cv.INTER_CUBIC)
+    img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+    return img
+
+
 def main(unused_argv):
+    img = load_image('../ecg-samples/original_ecg_v1_filtered_spectrogram.png')
+    cv.show
+
     # Load training and eval data
-    spectrograms = tf.contrib.learn.datasets.load_dataset("spectrograms")
+    spectrograms = tf.contrib.learn.datasets.load_dataset(".../ecg-samples/original_ecg_v1_filtered_spectrogram.png")
     train_data = spectrograms.train.images  # Returns np.array
     train_labels = np.asarray(spectrograms.train.labels, dtype=np.int32)
     eval_data = spectrograms.test.images  # Returns np.array

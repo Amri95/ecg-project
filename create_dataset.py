@@ -5,6 +5,8 @@ import cv2
 import numpy as np
 # import skimage.io as io
 import tensorflow as tf
+import os
+import pickle
 
 
 def _int64_feature(value):
@@ -16,12 +18,12 @@ def _bytes_feature(value):
 
 
 def load_image(addr):
-    # read an image and resize to (224, 224)
+    # read an image and resize to (256, 256)
     # cv2 load images as BGR, convert it to RGB
     img = cv2.imread(addr)
     if img is None:
         return None
-    img = cv2.resize(img, (224, 224), interpolation=cv2.INTER_CUBIC)
+    img = cv2.resize(img, (256, 256), interpolation=cv2.INTER_CUBIC)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     return img
 
@@ -36,6 +38,7 @@ def createDataRecord(out_filename, addrs, labels):
             sys.stdout.flush()
         # Load the image
         img = load_image(addrs[i])
+        # img = cv2.imread(addrs[i])
 
         label = labels[i]
 
@@ -58,13 +61,61 @@ def createDataRecord(out_filename, addrs, labels):
 
 
 def main():
-    cat_dog_train_path = '../ecg-samples/*.jpg'
-    # read addresses and labels from the 'train' folder
-    addrs = glob.glob(cat_dog_train_path)
-    labels = [0 if 'Cat' in addr else 1 for addr in addrs]  # 0 = Cat, 1 = Dog
+    folders_path = 'D:\\cygwin64\\home\\Bang\\wfdb-10.6.0\\afdb\\'
+
+    folders = ['04015', '04043', '04048', '04126', '04746', '04908', '04936', '05091', '05121', '05261', '06426',
+               '06453', '06995', '07162', '07859', '07879', '07910', '08215', '08219', '08378', '08405', '08434',
+               '08455']
+
+    # addrs = []
+    # labels = []
+    # for folder in folders:
+    #     # print(os.listdir(folders_path + folder + '\\'))
+    #     print(len(os.listdir(folders_path + folder + '\\')))
+    #     addrs += os.listdir(folders_path + folder + '\\')
+    #
+    #     with open(folders_path + folder + '_labels' + '\\' + folder + "_labels.p", "rb") as fp:
+    #         folder_labels = pickle.load(fp)
+    #         labels += folder_labels
+
+    spectrograms_path = 'D:\\cygwin64\\home\\Bang\\wfdb-10.6.0\\afdb\\spectrograms\\*.png'
+    addrs = glob.glob(spectrograms_path)
+
+    labels_path = 'D:\\cygwin64\\home\\Bang\\wfdb-10.6.0\\afdb\\spectrograms_labels\\spectrograms_labels.p'
+    with open(labels_path, "rb") as fp:
+        labels = pickle.load(fp)
+    print('labels', labels)
+    print('len(labels)', len(labels))
+    print('set(labels)', set(labels))
+    print('cv2.imread(addrs[0]).shape', cv2.imread(addrs[0]).shape) # (393, 536, 3)
+
+    # Want to have equal number of AFIB and not-AFIB ############################
+    count_afib = labels.count(1)
+    print('count_afib', count_afib)
+    # print(labels.count(1))
+    labels = np.asarray(labels)
+    print('labels.shape', labels.shape)
+
+    afib_indices = np.where(labels == 1)[0]
+    print('afib_indices.shape', afib_indices.shape)
+    print('afib_indices', afib_indices)
+
+    not_afib_indices = np.where(labels == 0)[0]
+    print('not_afib_indices', not_afib_indices)
+    np.random.shuffle(not_afib_indices)
+    print('not_afib_indices.shape', not_afib_indices.shape)
+    not_afib_indices_shuffled_subset = not_afib_indices[:count_afib]
+    print('not_afib_indices_shuffled_subset.shape', not_afib_indices_shuffled_subset.shape)
+    print('not_afib_indices_shuffled_subset', not_afib_indices_shuffled_subset)
+
+    labels_subset = np.take(labels, np.concatenate((afib_indices, not_afib_indices_shuffled_subset), axis=None))
+    print('labels_subset.shape', labels_subset.shape)
+
+    addrs_subset = np.take(addrs, np.concatenate((afib_indices, not_afib_indices_shuffled_subset), axis=None))
+    #############################################################################
 
     # to shuffle data
-    c = list(zip(addrs, labels))
+    c = list(zip(addrs_subset, labels_subset))
     shuffle(c)
     addrs, labels = zip(*c)
 

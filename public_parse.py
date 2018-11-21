@@ -7,18 +7,18 @@ import matplotlib.pyplot as plt
 
 
 def get_time_series(path):
-    class_labels_to_nums = {'AFIB': 1, 'N': 0, 'AFL': 0, 'J': 0}
+    class_labels_to_nums = {'N': 0, 'AFIB': 1, 'AFL': 0, 'J': 0}
 
     ecg_labels = []
 
     ecg_num = 0
-
-    for file_name in os.listdir(path):
+    print(path + '_labels' + '\\' + path[-5:] + '_labels.p')
+    for file_name in os.listdir(path + '_time_series\\'):
         if file_name[-3:] == 'csv':
             # print(path + file_name)
-            data = pd.read_csv(path + file_name, encoding="ISO-8859-1")
+            data = pd.read_csv(path + '_time_series\\' + file_name, encoding="ISO-8859-1")
             # data = pd.read_csv(path + file_name)
-            annotations = open(path + file_name[:-3] + 'txt', 'r')
+            annotations = open(path + '_time_series\\' + file_name[:-3] + 'txt', 'r')
             annotation_lines = annotations.readlines()
 
             curr_annot_line = 1
@@ -33,10 +33,11 @@ def get_time_series(path):
                 # print(curr_annot_line)
                 # print('annotation_lines[curr_annot_line]', annotation_lines[curr_annot_line].split()[7][1:])
                 if count_to_5_sec == 1250:
-                    with open(path + file_name[:-4] + "_" + str(ecg_num) + "_1.p", "wb") as fp:
-                        pickle.dump(ecg1, fp)
-                    with open(path + file_name[:-4] + "_" + str(ecg_num) + "_2.p", "wb") as fp:
-                        pickle.dump(ecg2, fp)
+                    # with open(path + file_name[:-4] + "_" + str(ecg_num) + "_1.p", "wb") as fp:
+                    #     pickle.dump(ecg1, fp)
+                    # with open(path + file_name[:-4] + "_" + str(ecg_num) + "_2.p", "wb") as fp:
+                    #     pickle.dump(ecg2, fp)
+                    #     print(path + file_name[:-4] + "_" + str(ecg_num) + "_1.p")
                     ecg_labels.append(class_labels_to_nums[annotation_lines[curr_annot_line].split()[7][1:]])
                     ecg1.clear()
                     ecg2.clear()
@@ -48,14 +49,16 @@ def get_time_series(path):
                         ecg1.clear()
                         ecg2.clear()
                         curr_annot_line += 1
-                        print(annotation_lines[curr_annot_line])
+                        # print(annotation_lines[curr_annot_line])
                         count_to_5_sec = 0
                     else:
                         ecg1.append(float(data.iloc[data_row, 1]))
                         ecg2.append(float(data.iloc[data_row, 2]))
                         count_to_5_sec += 1
 
-    with open('ebg_labels', "wb") as fp:
+    # print(len(ecg_labels))
+
+    with open(path + '_labels' + '\\' + path[-5:] + '_labels.p', "wb") as fp:
         pickle.dump(ecg_labels, fp)
 
 
@@ -67,7 +70,32 @@ def main():
                '08455']
 
     for folder in folders:
-        get_time_series(folders_path + folder + '\\')
+        get_time_series(folders_path + folder)
+        print(folder, 'done')
+
+    # Compile all the labels into 1 file
+    all_labels = []
+    count_all_labels = 0
+    for folder in folders:
+        with open(folders_path + folder + "_labels" + '\\' + folder + "_labels.p", "rb") as fp:
+            labels = pickle.load(fp)
+        all_labels += labels
+        count_all_labels += len(labels)
+        print(folder, len(labels))
+        print('0 occurrences:', labels.count(0))
+        print('1 occurrences:', labels.count(1))
+        print('2 occurrences:', labels.count(2))
+        print('3 occurrences:', labels.count(3))
+
+    with open(folders_path + 'spectrograms_labels' + '\\' + 'spectrograms_labels.p', "wb") as fp:
+        pickle.dump(all_labels, fp)
+
+    with open(folders_path + 'spectrograms_labels' + '\\' + 'spectrograms_labels.p', "rb") as fp:
+        check_labels = pickle.load(fp)
+
+    print(len(all_labels))
+    print(count_all_labels)
+    print(len(check_labels))
 
     # with open(file_path + "04043._0_1.p", "rb") as fp:
     #     signals = pickle.load(fp)

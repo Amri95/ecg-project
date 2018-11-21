@@ -4,17 +4,18 @@ import os
 
 def pdf_to_svg(path):
     for file_name in os.listdir(path):
-        print(file_name)
+        # print(file_name)
         if file_name == "ecg_1.PDF":
             print('yes')
             bash_command = "Inkscape/inkscape.exe -l " + path + file_name[:-3] + "svg " + path + file_name
             print(bash_command)
-            subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
+            print(subprocess.run(bash_command.split(), stdout=subprocess.PIPE))
 
 
 def main():
     path = "..\ecg-samples\\"
     pdf_to_svg(path)
+    print("python end")
 
 
 if __name__ == "__main__":
